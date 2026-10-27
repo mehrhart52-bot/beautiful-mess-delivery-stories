@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const config: NextConfig = {
   poweredByHeader: false,
+  allowedDevOrigins: ["*.app.github.dev"],
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["*.app.github.dev"],
+    },
+  },
   async headers() {
     return [{
       source: "/(.*)",
