@@ -109,6 +109,14 @@ grant select on public.profiles to authenticated;
 grant update (role, active) on public.profiles to authenticated;
 grant select, insert, update (body, updated_at) on public.stories to authenticated;
 grant delete on public.stories to authenticated;
+alter table public.stories add column if not exists theme text not null
+  default 'no_clear_theme'
+  check (theme in (
+    'ongoing_relationship', 'practical_obstacle', 'spiritual_growth',
+    'family_safety', 'community_connection', 'no_clear_theme'
+  ));
+grant update (theme) on public.stories to authenticated;
+create index if not exists stories_theme_experience_idx on public.stories(theme, experience);
 grant update (experience) on public.stories to authenticated;
 
 -- After creating your own account, run the following line with your email address

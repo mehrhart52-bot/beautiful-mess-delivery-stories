@@ -1,5 +1,15 @@
 # Beautiful Mess Ministries Connection Stories
 
+## Community Themes update
+
+Before running this version against an existing database, run
+`supabase/updates/20261027_community_themes.sql` in the Supabase SQL Editor.
+The experience-category update must already be installed.
+Existing stories start under “No clear theme yet”; authors can edit them
+to select a primary theme. New stories require one theme from the dropdown.
+Community Themes shows exact story counts for each theme, with collection
+filters and links to the supporting stories. Each story belongs to one theme.
+
 ## Updating an existing database for experience categories
 
 Run `supabase/updates/20261027_experiences.sql` in the Supabase SQL Editor

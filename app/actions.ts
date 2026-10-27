@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireAdmin, requireUser } from "@/lib/auth";
 import { wordCount } from "@/lib/types";
 import { isExperience } from "@/lib/experiences";
+import { isThemeId } from "@/lib/themes";
 
 const message = (path: string, text: string, error = false) =>
   `${path}?${error ? "error" : "message"}=${encodeURIComponent(text)}`;
@@ -83,13 +84,15 @@ function validateStory(body: string) {
 
 export async function createStory(formData: FormData) {
   const user = await requireUser();
+  const theme = formData.get("theme");
+  if (!isThemeId(theme)) redirect(message("/stories/new", "Please select one theme.", true));
   const experience = formData.get("experience");
   if (!isExperience(experience)) redirect(message("/stories/new", "Please select an experience.", true));
   const body = String(formData.get("body") ?? "").trim();
   const validation = validateStory(body);
   if (validation) redirect(message("/stories/new", validation, true));
   const supabase = await createClient();
-  const { error } = await supabase.from("stories").insert({ body, experience, user_id: user.id });
+  const { error } = await supabase.from("stories").insert({ body, experience, theme, user_id: user.id });
   if (error) redirect(message("/stories/new", "Your story could not be saved. Please try again.", true));
   revalidatePath("/stories");
   redirect(message("/stories/mine", "Your connection story was saved."));
@@ -98,6 +101,8 @@ export async function createStory(formData: FormData) {
 export async function updateStory(formData: FormData) {
   const user = await requireUser();
   const id = String(formData.get("id") ?? "");
+  const theme = formData.get("theme");
+  if (!isThemeId(theme)) redirect(message(`/stories/${id}/edit`, "Please select one theme.", true));
   const experience = formData.get("experience");
   if (!isExperience(experience)) redirect(message(`/stories/${id}/edit`, "Please select an experience.", true));
   const body = String(formData.get("body") ?? "").trim();
@@ -106,7 +111,7 @@ export async function updateStory(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("stories")
-    .update({ body, experience, updated_at: new Date().toISOString() })
+    .update({ body, experience, theme, updated_at: new Date().toISOString() })
     .eq("id", id)
     .eq("user_id", user.id);
   if (error) redirect(message(`/stories/${id}/edit`, "Your changes could not be saved.", true));

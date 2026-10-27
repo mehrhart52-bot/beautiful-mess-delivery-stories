@@ -6,6 +6,7 @@ const choices = [
   ["2", "View my connection stories", "Read and edit the stories you have shared.", "/stories/mine"],
   ["3", "View all connection stories", "Celebrate the experiences shared by the whole community.", "/stories/all"],
   ["4", "View the current word cloud", "See the words and themes appearing across every story.", "/word-cloud"],
+  ["5", "Explore Community Themes", "Discover what happened or changed, and read the stories behind each theme.", "/themes"],
 ];
 
 export default async function Dashboard() {
