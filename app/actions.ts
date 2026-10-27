@@ -14,7 +14,14 @@ export async function login(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect(message("/login", "Email or password was not recognized.", true));
+  if (error) {
+    const explanation = error.code === "email_not_confirmed"
+      ? "Your email has not been confirmed. Please use the confirmation email or contact the administrator for help."
+      : error.code === "invalid_credentials"
+        ? "Email or password was not recognized. Check your password with Show, or choose Forgot your password."
+        : "Login is temporarily unavailable. Please try again shortly.";
+    redirect(message("/login", explanation, true));
+  }
   redirect("/dashboard");
 }
 
@@ -26,7 +33,7 @@ export async function signup(formData: FormData) {
   if (password.length < 8) redirect(message("/signup", "Use at least 8 characters for your password.", true));
   const supabase = await createClient();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -35,7 +42,8 @@ export async function signup(formData: FormData) {
     },
   });
   if (error) redirect(message("/signup", error.message, true));
-  redirect(message("/login", "Account created. Check your email if confirmation is required, then sign in."));
+  if (data.session) redirect("/dashboard");
+  redirect(message("/login", "Check your email for a confirmation link before signing in."));
 }
 
 export async function logout() {

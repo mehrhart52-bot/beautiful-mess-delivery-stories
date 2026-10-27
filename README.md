@@ -43,6 +43,18 @@ For account-confirmation and password-reset email, open **Authentication → URL
 
 ## Development
 
+### Allow signup without email verification
+
+In this app's Supabase project, open Authentication → Sign In / Providers
+(or Providers), open Email, switch Confirm email off, and save.
+New signups will then sign in immediately without a verification email.
+Password-reset emails remain enabled.
+
+Existing unconfirmed accounts may still need confirmation: inspect the account
+under Authentication → Users and use its confirmation action if available.
+Do not delete an existing account to resolve login problems, as its stories
+are linked to it.
+
 ```sh
 npm ci
 npm run dev

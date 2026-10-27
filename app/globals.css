@@ -62,6 +62,10 @@ label { display: block; color: var(--navy); font-weight: 800; margin: 0 0 7px; }
 input, textarea, select { width: 100%; border: 1px solid #9fafb7; border-radius: 7px; background: white; padding: 12px 14px; color: var(--ink); }
 input:focus, textarea:focus, select:focus { outline: 3px solid rgba(255,199,44,.55); border-color: var(--blue); }
 .field { margin-bottom: 20px; }
+.password-input { display: flex; align-items: stretch; gap: 8px; }
+.password-input input { min-width: 0; flex: 1; }
+.password-input button { border: 1px solid var(--blue); border-radius: 7px; color: var(--blue); background: white; padding: 10px 14px; font-weight: 700; min-width: 75px; }
+.password-input button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 .field-help { color: var(--muted); font-size: 14px; }
 .auth-links { margin-top: 24px; display: flex; justify-content: space-between; gap: 20px; font-size: 14px; }
 .notice { border-radius: 7px; padding: 12px 15px; margin: 0 0 22px; font-weight: 700; }

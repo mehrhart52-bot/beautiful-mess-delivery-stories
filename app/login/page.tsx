@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { currentProfile } from "@/lib/auth";
 import { login } from "@/app/actions";
 import Notice from "@/components/Notice";
+import PasswordInput from "@/components/PasswordInput";
 
 export default async function Login({ searchParams }: { searchParams: Promise<{ message?: string; error?: string }> }) {
   let profile = null;
@@ -16,7 +17,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
     <Notice {...params} />
     <form action={login}>
       <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" required /></div>
-      <div className="field"><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required /></div>
+      <div className="field"><label htmlFor="password">Password</label><PasswordInput /></div>
       <button className="button" type="submit">Log in</button>
     </form>
     <div className="auth-links"><Link href="/forgot-password">Forgot your password?</Link><Link href="/signup">Create an account</Link></div>
