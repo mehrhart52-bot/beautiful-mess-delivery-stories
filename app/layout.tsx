@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/stories/new">Create Story</Link>
                 <Link href="/stories/mine">My Stories</Link>
                 <StoriesMenu />
-                <Link href="/word-cloud">Word Cloud</Link>
+                <StoriesMenu label="Word Cloud" href="/word-cloud" />
                 {profile.role === "admin" && <Link href="/admin">Admin</Link>}
                 <form className="nav-form" action={logout}><button className="nav-button">Log out</button></form>
               </> : <Link href="/login">Log in</Link>}
