@@ -15,6 +15,21 @@ A separate web application for collecting and celebrating CarePortal and Beautif
 
 ## One-time setup
 
+The existing Delivery Stories development project is already connected for local previews.
+Download and unzip the latest GitHub ZIP, open a terminal in the extracted folder, and run:
+
+```sh
+npm run dev
+```
+
+The first run installs dependencies automatically. Open http://localhost:3000 after Ready appears.
+No configuration file is needed. These defaults contain only the project's public URL and
+publishable key; login and database security rules still control access.
+Existing environment or .env.local settings take precedence. Stop with Control+C and use
+the same command to restart. Production builds require explicit environment settings.
+
+The steps below are only needed when connecting a different Supabase project:
+
 The app uses Supabase because it provides the database, secure login, and password-reset email in one service.
 
 1. Create a new Supabase project for this app at `supabase.com`.
