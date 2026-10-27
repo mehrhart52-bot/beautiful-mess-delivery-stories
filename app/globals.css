@@ -72,6 +72,12 @@ input:focus, textarea:focus, select:focus { outline: 3px solid rgba(255,199,44,.
 .notice-error { background: #fff0f0; border: 1px solid #dba6a6; color: var(--danger); }
 .notice-success { background: #edf8f0; border: 1px solid #a9ceb2; color: var(--success); }
 .story-form { max-width: 800px; }
+.experience-options { border: 1px solid var(--line); border-radius: 8px; padding: 18px; margin: 0 0 24px; }
+.experience-options legend { font-weight: 700; }
+.experience-options label { display: flex; gap: 10px; align-items: center; padding: 8px; }
+.experience-options input { width: auto; }
+.cloud-filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
+.cloud-filters a[aria-current="page"] { background: var(--navy); color: white; }
 .privacy-reminder { background: var(--gold-soft); border: 2px solid var(--gold); border-left: 6px solid var(--gold); border-radius: 8px; padding: 18px 20px; margin: 16px 0 20px; color: var(--navy); }
 .privacy-reminder strong { display: block; font-size: 20px; margin-bottom: 8px; }
 .privacy-reminder p { margin: 0 0 8px; }

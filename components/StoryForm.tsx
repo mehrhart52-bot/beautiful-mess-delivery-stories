@@ -2,22 +2,31 @@
 
 import { useState } from "react";
 import { wordCount } from "@/lib/types";
+import { experiences } from "@/lib/experiences";
 
 export default function StoryForm({
   action,
   initial = "",
   id,
+  experience,
 }: {
   action: (data: FormData) => void | Promise<void>;
   initial?: string;
   id?: string;
+  experience?: string | null;
 }) {
   const [body, setBody] = useState(initial);
   const count = wordCount(body);
   return (
     <form action={action} className="story-form">
       {id && <input type="hidden" name="id" value={id} />}
-      <label htmlFor="body">Tell us about the delivery</label>
+      <fieldset className="experience-options">
+        <legend>Where did this experience come from? Choose one.</legend>
+        {experiences.map(option => <label key={option}>
+          <input type="radio" name="experience" value={option} defaultChecked={experience === option} required /> {option}
+        </label>)}
+      </fieldset>
+      <label htmlFor="body">Tell us about the experience</label>
       <div className="privacy-reminder" id="story-privacy">
         <strong>Protect the privacy of the people you helped.</strong>
         <p>All active users can read your story. Do not include full names, addresses, phone numbers, email addresses, medical information, or other sensitive personal details.</p>

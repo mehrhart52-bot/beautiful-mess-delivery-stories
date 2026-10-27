@@ -6,8 +6,8 @@ import { logout } from "@/app/actions";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Delivery Stories · Beautiful Mess Ministries", template: "%s · Beautiful Mess Ministries" },
-  description: "Share and celebrate CarePortal and Beautiful Mess Ministries delivery stories.",
+  title: { default: "Connection Stories · Beautiful Mess Ministries", template: "%s · Beautiful Mess Ministries" },
+  description: "Share and celebrate CarePortal and Beautiful Mess Ministries connection stories.",
 };
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="topline" />
         <header className="site-header">
           <div className="header-inner">
-            <Link href={profile ? "/dashboard" : "/login"} aria-label="Beautiful Mess Ministries delivery stories">
+            <Link href={profile ? "/dashboard" : "/login"} aria-label="Beautiful Mess Ministries connection stories">
               <Image className="logo" src="/beautiful-mess-logo.jpg" alt="Beautiful Mess Ministries" width={693} height={233} preload unoptimized />
             </Link>
             <nav aria-label="Main navigation">

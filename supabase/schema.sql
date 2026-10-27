@@ -23,6 +23,8 @@ create table if not exists public.stories (
 );
 
 create index if not exists stories_user_id_idx on public.stories(user_id);
+alter table public.stories add column if not exists experience text
+  check (experience in ('CarePortal', 'Beautiful Mess Ministries', 'Other'));
 create index if not exists stories_created_at_idx on public.stories(created_at desc);
 
 create or replace function public.handle_new_user()
@@ -107,6 +109,7 @@ grant select on public.profiles to authenticated;
 grant update (role, active) on public.profiles to authenticated;
 grant select, insert, update (body, updated_at) on public.stories to authenticated;
 grant delete on public.stories to authenticated;
+grant update (experience) on public.stories to authenticated;
 
 -- After creating your own account, run the following line with your email address
 -- to make yourself the first administrator:

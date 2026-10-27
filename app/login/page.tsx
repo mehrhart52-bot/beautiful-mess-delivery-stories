@@ -11,9 +11,9 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
   if (profile) redirect("/dashboard");
   const params = await searchParams;
   return <div className="auth-card">
-    <p className="eyebrow">Delivery Stories</p>
+    <p className="eyebrow">Connection Stories</p>
     <h1>Welcome back</h1>
-    <p>Log in with your email address to share and read delivery stories.</p>
+    <p>Log in with your email address to share and read connection stories.</p>
     <Notice {...params} />
     <form action={login}>
       <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" required /></div>

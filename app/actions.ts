@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin, requireUser } from "@/lib/auth";
 import { wordCount } from "@/lib/types";
+import { isExperience } from "@/lib/experiences";
 
 const message = (path: string, text: string, error = false) =>
   `${path}?${error ? "error" : "message"}=${encodeURIComponent(text)}`;
@@ -75,33 +76,37 @@ export async function updatePassword(formData: FormData) {
 
 function validateStory(body: string) {
   const count = wordCount(body);
-  if (!body.trim()) return "Please enter your delivery story.";
+  if (!body.trim()) return "Please enter your connection story.";
   if (count > 300) return `Please shorten your story by ${count - 300} word${count - 300 === 1 ? "" : "s"}.`;
   return null;
 }
 
 export async function createStory(formData: FormData) {
   const user = await requireUser();
+  const experience = formData.get("experience");
+  if (!isExperience(experience)) redirect(message("/stories/new", "Please select an experience.", true));
   const body = String(formData.get("body") ?? "").trim();
   const validation = validateStory(body);
   if (validation) redirect(message("/stories/new", validation, true));
   const supabase = await createClient();
-  const { error } = await supabase.from("stories").insert({ body, user_id: user.id });
+  const { error } = await supabase.from("stories").insert({ body, experience, user_id: user.id });
   if (error) redirect(message("/stories/new", "Your story could not be saved. Please try again.", true));
   revalidatePath("/stories");
-  redirect(message("/stories/mine", "Your delivery story was saved."));
+  redirect(message("/stories/mine", "Your connection story was saved."));
 }
 
 export async function updateStory(formData: FormData) {
   const user = await requireUser();
   const id = String(formData.get("id") ?? "");
+  const experience = formData.get("experience");
+  if (!isExperience(experience)) redirect(message(`/stories/${id}/edit`, "Please select an experience.", true));
   const body = String(formData.get("body") ?? "").trim();
   const validation = validateStory(body);
   if (validation) redirect(message(`/stories/${id}/edit`, validation, true));
   const supabase = await createClient();
   const { error } = await supabase
     .from("stories")
-    .update({ body, updated_at: new Date().toISOString() })
+    .update({ body, experience, updated_at: new Date().toISOString() })
     .eq("id", id)
     .eq("user_id", user.id);
   if (error) redirect(message(`/stories/${id}/edit`, "Your changes could not be saved.", true));
@@ -131,7 +136,7 @@ export async function deleteStory(formData: FormData) {
   const destination = user.role === "admin" && story.user_id !== user.id
     ? "/stories/all"
     : "/stories/mine";
-  redirect(message(destination, "The delivery story was deleted."));
+  redirect(message(destination, "The connection story was deleted."));
 }
 
 export async function updateAccess(formData: FormData) {

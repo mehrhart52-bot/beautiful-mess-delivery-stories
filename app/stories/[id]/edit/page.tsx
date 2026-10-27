@@ -14,5 +14,5 @@ export default async function EditStory({ params, searchParams }: { params: Prom
   if (!data) notFound();
   const story = data as Story;
   if (story.user_id !== user.id) redirect(`/stories/${id}`);
-  return <><p className="eyebrow">Edit</p><h1>Update your delivery story</h1><Notice {...await searchParams} /><StoryForm action={updateStory} initial={story.body} id={story.id} /></>;
+  return <><p className="eyebrow">Edit</p><h1>Update your connection story</h1><Notice {...await searchParams} /><StoryForm action={updateStory} initial={story.body} experience={story.experience} id={story.id} /></>;
 }

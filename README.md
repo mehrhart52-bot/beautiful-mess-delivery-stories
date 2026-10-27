@@ -1,4 +1,13 @@
-# Beautiful Mess Ministries Delivery Stories
+# Beautiful Mess Ministries Connection Stories
+
+## Updating an existing database for experience categories
+
+Run `supabase/updates/20261027_experiences.sql` in the Supabase SQL Editor
+before using this version. It adds a category field without deleting stories.
+Authors choose CarePortal, Beautiful Mess Ministries, or Other when creating
+or editing a story. Previously saved stories remain in the All stories cloud;
+their authors can edit them to assign a category. Category clouds count only
+words in that category and keep the five-appearance minimum and 12-word maximum.
 
 A separate web application for collecting and celebrating CarePortal and Beautiful Mess Ministries delivery stories.
 

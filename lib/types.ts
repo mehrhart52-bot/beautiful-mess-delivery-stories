@@ -8,6 +8,7 @@ export type Profile = {
 };
 
 export type Story = {
+  experience: string | null;
   id: string;
   user_id: string;
   body: string;
