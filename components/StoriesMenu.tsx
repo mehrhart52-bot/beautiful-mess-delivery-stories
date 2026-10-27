@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useEffect } from "react";
 import { experiences } from "@/lib/experiences";
+import styles from "./StoriesMenu.module.css";
 
 export default function StoriesMenu({ label = "Stories", href = "/stories/all" }: { label?: string; href?: string }) {
   const menu = useRef<HTMLDetailsElement>(null);
@@ -14,11 +15,11 @@ export default function StoriesMenu({ label = "Stories", href = "/stories/all" }
     return () => document.removeEventListener("pointerdown", closeOutside);
   }, []);
   function close() { if (menu.current) menu.current.open = false; }
-  return <details ref={menu} className="stories-menu" onKeyDown={event => {
+  return <details ref={menu} className={styles.menu} onKeyDown={event => {
     if (event.key === "Escape") { close(); menu.current?.querySelector("summary")?.focus(); }
   }}>
     <summary>{label}</summary>
-    <div className="stories-menu-options">
+    <div className={styles.options}>
       <Link href={href} onClick={close}>All</Link>
       {experiences.map(option => <Link key={option} href={`${href}?experience=${encodeURIComponent(option)}`} onClick={close}>{option}</Link>)}
     </div>
