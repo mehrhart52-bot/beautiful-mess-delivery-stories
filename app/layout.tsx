@@ -23,7 +23,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="site-header">
           <div className="header-inner">
             <Link href={profile ? "/dashboard" : "/login"} aria-label="Beautiful Mess Ministries delivery stories">
-              <Image className="logo" src="/beautiful-mess-logo.svg" alt="Beautiful Mess Ministries" width={1180} height={300} priority />
+              <Image className="logo" src="/beautiful-mess-logo.jpg" alt="Beautiful Mess Ministries" width={693} height={233} preload unoptimized />
             </Link>
             <nav aria-label="Main navigation">
               {profile ? <>
