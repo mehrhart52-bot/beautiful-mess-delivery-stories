@@ -1,5 +1,15 @@
 # Beautiful Mess Ministries Connection Stories
 
+## Story IDs and search update
+
+Run `supabase/updates/20261027_story_identifiers.sql` in the Supabase SQL Editor
+before using this version. Existing stories receive a unique readable ID.
+CarePortal uses C, Beautiful Mess Ministries uses B, and Other or uncategorized
+legacy stories use O. The number is shared across categories and may have gaps.
+IDs stay unchanged when a story is edited, including category changes.
+Search by the complete ID in My Stories, Stories, or a theme's story list.
+Searches respect the current collection, theme, and account permissions.
+
 ## Community Themes update
 
 Before running this version against an existing database, run

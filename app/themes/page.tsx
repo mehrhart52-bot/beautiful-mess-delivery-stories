@@ -6,11 +6,15 @@ import { themes, themeFor } from "@/lib/themes";
 import type { Story } from "@/lib/types";
 import StoryCard from "@/components/StoryCard";
 
+import StorySearch from "@/components/StorySearch";
+import { normalizeStorySearch, storyListUrl } from "@/lib/story-search";
+
 export default async function CommunityThemes({ searchParams }: {
-  searchParams: Promise<{ experience?: string; theme?: string; page?: string }>;
+  searchParams: Promise<{ experience?: string; theme?: string; page?: string; q?: string }>;
 }) {
   await requireUser();
   const params = await searchParams;
+  const search = normalizeStorySearch(params.q);
   const experience = isExperience(params.experience) ? params.experience : null;
   const selected = themeFor(params.theme);
   const supabase = await createClient();
@@ -18,6 +22,7 @@ export default async function CommunityThemes({ searchParams }: {
     const query = new URLSearchParams();
     if (collection) query.set("experience", collection);
     if (theme) query.set("theme", theme);
+    if (theme && search) query.set("q", search);
     if (page > 1) query.set("page", String(page));
     return `/themes?${query}`;
   }
@@ -30,6 +35,7 @@ export default async function CommunityThemes({ searchParams }: {
     const page = Number.isSafeInteger(parsed) && parsed > 0 ? Math.min(parsed, 100000) : 1;
     let query = supabase.from("stories").select("*, profiles(display_name, email)", { count: "exact" }).eq("theme", selected.id);
     if (experience) query = query.eq("experience", experience);
+    if (search) query = query.eq("story_code", search);
     const { data, count, error } = await query.order("created_at", { ascending: false }).order("id").range((page - 1) * 20, page * 20 - 1);
     if (error) throw new Error("Theme stories could not be loaded. Please try again.");
     const stories = (data ?? []) as Story[];
@@ -37,8 +43,8 @@ export default async function CommunityThemes({ searchParams }: {
       <Link className="text-link" href={url()}>← All community themes</Link>
       <p className="eyebrow">Community Themes · {experience || "All stories"}</p>
       <h1>{selected.label}</h1><p className="lead">{selected.description}</p>
-      {filters}<p>{count ?? 0} {(count ?? 0) === 1 ? "story" : "stories"}</p>
-      {stories.length ? <div className="story-list">{stories.map(story => <StoryCard key={story.id} story={story} showAuthor returnTo={url(selected.id, page)} />)}</div> : <div className="empty">No stories to display here yet.</div>}
+      {filters}<StorySearch action="/themes" search={search} filters={{ theme: selected.id, experience }} /><p>{count ?? 0} {(count ?? 0) === 1 ? "story" : "stories"}</p>
+      {stories.length ? <div className="story-list">{stories.map(story => <StoryCard key={story.id} story={story} showAuthor returnTo={url(selected.id, page)} />)}</div> : <div className="empty">{search ? "No matching story in this theme and collection." : "No stories to display here yet."}</div>}
       <div className="page-actions">
         {page > 1 && <Link className="button secondary" href={url(selected.id, page - 1)}>Previous</Link>}
         {page * 20 < (count ?? 0) && <Link className="button secondary" href={url(selected.id, page + 1)}>Next</Link>}
