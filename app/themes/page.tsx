@@ -38,7 +38,7 @@ export default async function CommunityThemes({ searchParams }: {
       <p className="eyebrow">Community Themes · {experience || "All stories"}</p>
       <h1>{selected.label}</h1><p className="lead">{selected.description}</p>
       {filters}<p>{count ?? 0} {(count ?? 0) === 1 ? "story" : "stories"}</p>
-      {stories.length ? <div className="story-list">{stories.map(story => <StoryCard key={story.id} story={story} showAuthor />)}</div> : <div className="empty">No stories to display here yet.</div>}
+      {stories.length ? <div className="story-list">{stories.map(story => <StoryCard key={story.id} story={story} showAuthor returnTo={url(selected.id, page)} />)}</div> : <div className="empty">No stories to display here yet.</div>}
       <div className="page-actions">
         {page > 1 && <Link className="button secondary" href={url(selected.id, page - 1)}>Previous</Link>}
         {page * 20 < (count ?? 0) && <Link className="button secondary" href={url(selected.id, page + 1)}>Next</Link>}
