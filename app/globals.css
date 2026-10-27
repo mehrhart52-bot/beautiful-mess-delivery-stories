@@ -85,7 +85,8 @@ input:focus, textarea:focus, select:focus { outline: 3px solid rgba(255,199,44,.
 .story-full { white-space: pre-wrap; font-size: 19px; }
 .page-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0; }
 .empty { background: var(--gold-soft); border: 1px solid #ead473; border-radius: 10px; padding: 24px; margin-top: 28px; }
-.word-cloud { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 13px 20px; background: white; border: 1px solid var(--line); border-radius: 14px; padding: 48px 34px; min-height: 400px; margin-top: 28px; }
+.word-cloud { background: white; border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-top: 28px; }
+.word-cloud svg { display: block; width: 100%; height: auto; }
 .cloud-word { color: var(--blue); font-weight: 800; line-height: 1; }
 .cloud-word:nth-child(3n) { color: var(--navy); }
 .cloud-word:nth-child(5n) { color: #a87900; }
