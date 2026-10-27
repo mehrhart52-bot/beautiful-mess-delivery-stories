@@ -94,8 +94,13 @@ input:focus, textarea:focus, select:focus { outline: 3px solid rgba(255,199,44,.
 .word-count { color: var(--muted); text-align: right; margin: 5px 0 18px; font-size: 14px; }
 .over-limit { color: var(--danger); font-weight: 800; }
 .story-list { display: grid; gap: 18px; margin-top: 30px; }
-.story-search .page-actions { margin: 8px 0; }
-.story-search input:not([type="hidden"]) { width: min(100%, 320px); }
+.story-search { display: flex; flex-direction: column; align-items: flex-end; width: min(100%, 230px); margin: 16px 0 16px auto; }
+.story-search-control { display: flex; width: 100%; align-items: center; border: 1px solid var(--line); border-radius: 7px; background: white; }
+.story-search input:not([type="hidden"]) { flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; padding: 8px 10px; font-size: 15px; }
+.story-search button { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); }
+.story-search button:hover { color: var(--blue); background: var(--cream, #edf4f7); }
+.story-search button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.story-search-clear { margin-top: 4px; color: var(--blue); font-size: 13px; }
 .story-card { padding: 24px; }
 .story-meta { color: var(--muted); display: flex; justify-content: space-between; gap: 20px; font-size: 14px; margin-bottom: 12px; }
 .story-full { white-space: pre-wrap; font-size: 19px; }
