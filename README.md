@@ -2,6 +2,13 @@
 
 ## Story IDs and search update
 
+IDs now use exactly four digits: C0001, B0002, O0003.
+After the original identifier update, run
+`supabase/updates/20261027_four_digit_ids.sql` to shorten existing IDs and
+use the new format for future stories. Story text and internal links are preserved.
+The shared sequence stops at 9999 rather than wrapping or issuing duplicate IDs;
+the numbering scheme will need expanding before that capacity is reached.
+
 Run `supabase/updates/20261027_story_identifiers.sql` in the Supabase SQL Editor
 before using this version. Existing stories receive a unique readable ID.
 CarePortal uses C, Beautiful Mess Ministries uses B, and Other or uncategorized
