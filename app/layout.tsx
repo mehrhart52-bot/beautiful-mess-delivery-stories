@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { currentProfile } from "@/lib/auth";
 import { logout } from "@/app/actions";
+import StoriesMenu from "@/components/StoriesMenu";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/dashboard">Home</Link>
                 <Link href="/stories/new">Create Story</Link>
                 <Link href="/stories/mine">My Stories</Link>
-                <Link href="/stories/all">All Stories</Link>
+                <StoriesMenu />
                 <Link href="/word-cloud">Word Cloud</Link>
                 {profile.role === "admin" && <Link href="/admin">Admin</Link>}
                 <form className="nav-form" action={logout}><button className="nav-button">Log out</button></form>

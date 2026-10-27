@@ -23,7 +23,7 @@ export default function StoryForm({
       <fieldset className="experience-options">
         <legend>Where did this experience come from? Choose one.</legend>
         {experiences.map(option => <label key={option}>
-          <input type="radio" name="experience" value={option} defaultChecked={experience === option} required /> {option}
+          <input type="radio" name="experience" value={option} defaultChecked={experience === option} required /><span>{option}</span>
         </label>)}
       </fieldset>
       <label htmlFor="body">Tell us about the experience</label>

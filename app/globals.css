@@ -74,8 +74,16 @@ input:focus, textarea:focus, select:focus { outline: 3px solid rgba(255,199,44,.
 .story-form { max-width: 800px; }
 .experience-options { border: 1px solid var(--line); border-radius: 8px; padding: 18px; margin: 0 0 24px; }
 .experience-options legend { font-weight: 700; }
-.experience-options label { display: flex; gap: 10px; align-items: center; padding: 8px; }
-.experience-options input { width: auto; }
+.experience-options label { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 10px; align-items: center; padding: 8px; cursor: pointer; }
+.experience-options input[type="radio"] { width: 20px; height: 20px; flex: 0 0 20px; padding: 0; margin: 0; accent-color: var(--blue); }
+.experience-options label span { flex: 1; min-width: 0; }
+.stories-menu { position: relative; }
+.stories-menu summary { cursor: pointer; padding: 8px 0; }
+.stories-menu summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.stories-menu-options { position: absolute; top: 100%; right: 0; z-index: 20; min-width: 230px; max-width: calc(100vw - 40px); padding: 8px; background: white; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 25px rgba(0,43,61,.15); }
+.stories-menu-options a { display: block; padding: 12px; border-radius: 4px; }
+.stories-menu-options a:hover, .stories-menu-options a:focus-visible { background: var(--gold-soft); }
+@media (max-width: 760px) { .stories-menu-options { right: auto; left: 0; min-width: 200px; } }
 .cloud-filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
 .cloud-filters a[aria-current="page"] { background: var(--navy); color: white; }
 .privacy-reminder { background: var(--gold-soft); border: 2px solid var(--gold); border-left: 6px solid var(--gold); border-radius: 8px; padding: 18px 20px; margin: 16px 0 20px; color: var(--navy); }
