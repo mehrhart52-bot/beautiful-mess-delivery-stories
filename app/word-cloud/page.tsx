@@ -10,7 +10,7 @@ function cloud(text: string) {
     if (word.length < 3 || stopWords.has(word)) continue;
     counts.set(word, (counts.get(word) ?? 0) + 1);
   }
-  const words = [...counts].sort((a, b) => b[1] - a[1]).slice(0, 70);
+  const words = [...counts].filter(([, count]) => count >= 5).sort((a, b) => b[1] - a[1]).slice(0, 70);
   const max = words[0]?.[1] ?? 1;
   return words.map(([word, count]) => ({ word, count, size: Math.round(16 + (count / max) * 42) }));
 }
@@ -20,5 +20,5 @@ export default async function WordCloud() {
   const supabase = await createClient();
   const { data } = await supabase.from("stories").select("body");
   const words = cloud((data ?? []).map(row => row.body).join(" "));
-  return <><p className="eyebrow">Shared themes</p><h1>Current word cloud</h1><p className="lead">Larger words appear more often across all saved delivery stories. The cloud updates whenever a story is saved.</p>{words.length ? <div className="word-cloud" aria-label="Word cloud">{words.map(({ word, count, size }) => <span className="cloud-word" style={{ fontSize: size }} title={`${count} appearance${count === 1 ? "" : "s"}`} key={word}>{word}</span>)}</div> : <div className="empty"><h2>The word cloud is waiting for stories</h2><p>Words will appear here after the first delivery story is saved.</p></div>}</>;
+  return <><p className="eyebrow">Shared themes</p><h1>Current word cloud</h1><p className="lead">Only words used at least five times across all saved delivery stories appear here. Larger words appear more often. The cloud updates whenever a story is saved.</p>{words.length ? <div className="word-cloud" aria-label="Word cloud">{words.map(({ word, count, size }) => <span className="cloud-word" style={{ fontSize: size }} title={`${count} appearance${count === 1 ? "" : "s"}`} key={word}>{word}</span>)}</div> : <div className="empty"><h2>No words have reached five appearances yet</h2><p>As more stories are shared, words used five times or more will appear here.</p></div>}</>;
 }

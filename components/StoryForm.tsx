@@ -18,10 +18,15 @@ export default function StoryForm({
     <form action={action} className="story-form">
       {id && <input type="hidden" name="id" value={id} />}
       <label htmlFor="body">Tell us about the delivery</label>
-      <p className="field-help">Share the moment in your own words. Please leave out private details such as full names, addresses, or medical information.</p>
+      <div className="privacy-reminder" id="story-privacy">
+        <strong>Protect the privacy of the people you helped.</strong>
+        <p>All active users can read your story. Do not include full names, addresses, phone numbers, email addresses, medical information, or other sensitive personal details.</p>
+        <p>Use descriptions such as “a family” or “a neighbor” instead.</p>
+      </div>
       <textarea
         id="body"
         name="body"
+        aria-describedby="story-privacy"
         rows={13}
         value={body}
         onChange={(event) => setBody(event.target.value)}

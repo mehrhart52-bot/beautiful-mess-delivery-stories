@@ -68,6 +68,10 @@ input:focus, textarea:focus, select:focus { outline: 3px solid rgba(255,199,44,.
 .notice-error { background: #fff0f0; border: 1px solid #dba6a6; color: var(--danger); }
 .notice-success { background: #edf8f0; border: 1px solid #a9ceb2; color: var(--success); }
 .story-form { max-width: 800px; }
+.privacy-reminder { background: var(--gold-soft); border: 2px solid var(--gold); border-left: 6px solid var(--gold); border-radius: 8px; padding: 18px 20px; margin: 16px 0 20px; color: var(--navy); }
+.privacy-reminder strong { display: block; font-size: 20px; margin-bottom: 8px; }
+.privacy-reminder p { margin: 0 0 8px; }
+.privacy-reminder p:last-child { margin-bottom: 0; }
 .story-form textarea { resize: vertical; min-height: 310px; }
 .word-count { color: var(--muted); text-align: right; margin: 5px 0 18px; font-size: 14px; }
 .over-limit { color: var(--danger); font-weight: 800; }
