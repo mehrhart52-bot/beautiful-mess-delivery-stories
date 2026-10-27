@@ -7,7 +7,7 @@ function cloud(text: string) {
   const counts = new Map<string, number>();
   for (const raw of text.toLowerCase().match(/[a-z']+/g) ?? []) {
     const word = raw.replace(/^'|'$/g, "");
-    if (word.length < 3 || stopWords.has(word)) continue;
+    if (word.length < 3 || stopWords.has(word) || word === "careportal" || word === "careportal's") continue;
     counts.set(word, (counts.get(word) ?? 0) + 1);
   }
   const words = [...counts].filter(([, count]) => count >= 5).sort((a, b) => b[1] - a[1]).slice(0, 70);
