@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { currentProfile } from "@/lib/auth";
@@ -18,7 +19,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
     <form action={login}>
       <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" required /></div>
       <div className="field"><label htmlFor="password">Password</label><PasswordInput /></div>
-      <button className="button" type="submit">Log in</button>
+      <SubmitButton pendingText="Logging in…">Log in</SubmitButton>
     </form>
     <div className="auth-links"><Link href="/forgot-password">Forgot your password?</Link><Link href="/signup">Create an account</Link></div>
   </div>;

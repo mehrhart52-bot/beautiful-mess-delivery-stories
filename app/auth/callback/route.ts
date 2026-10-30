@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const requested = url.searchParams.get("next") || "/dashboard";
-  const next = requested.startsWith("/") && !requested.startsWith("//")
+  const next = ["/dashboard", "/reset-password"].includes(requested)
     ? requested
     : "/dashboard";
 

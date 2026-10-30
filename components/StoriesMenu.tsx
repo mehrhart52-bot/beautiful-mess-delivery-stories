@@ -15,7 +15,15 @@ export default function StoriesMenu({ label = "Stories", href = "/stories/all" }
     return () => document.removeEventListener("pointerdown", closeOutside);
   }, []);
   function close() { if (menu.current) menu.current.open = false; }
-  return <details ref={menu} className={styles.menu} onKeyDown={event => {
+  return <details ref={menu} className={styles.menu} onToggle={() => {
+    const panel = menu.current?.querySelector("div");
+    if (menu.current?.open && panel) {
+      panel.style.transform = "";
+      const box = panel.getBoundingClientRect();
+      const shift = box.left < 12 ? 12 - box.left : box.right > window.innerWidth - 12 ? window.innerWidth - 12 - box.right : 0;
+      panel.style.transform = `translateX(${shift}px)`;
+    }
+  }} onKeyDown={event => {
     if (event.key === "Escape") { close(); menu.current?.querySelector("summary")?.focus(); }
   }}>
     <summary>{label}</summary>

@@ -7,7 +7,7 @@ import Notice from "@/components/Notice";
 import DeleteStoryButton from "@/components/DeleteStoryButton";
 import { storyReturn } from "@/lib/story-navigation";
 
-export default async function StoryPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ message?: string; returnTo?: string }> }) {
+export default async function StoryPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ message?: string; error?: string; returnTo?: string }> }) {
   const back = storyReturn((await searchParams).returnTo);
   const user = await requireUser();
   const { id } = await params;
@@ -16,5 +16,5 @@ export default async function StoryPage({ params, searchParams }: { params: Prom
   if (!data) notFound();
   const story = data as Story;
   const canDelete = story.user_id === user.id || user.role === "admin";
-  return <><p className="eyebrow">Connection story</p><h1>A moment of care</h1><p className="eyebrow">Story {story.story_code}</p><Notice {...await searchParams} /><div className="story-meta"><strong>{story.profiles?.display_name || "Community member"}</strong><span>{new Date(story.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span></div><article className="panel story-full" style={{ padding: 30 }}>{story.body}</article><div className="page-actions">{story.user_id === user.id && <Link className="button" href={`/stories/${story.id}/edit`}>Edit my story</Link>}{canDelete && <DeleteStoryButton id={story.id} />}<Link className="button secondary" href={back.href}>{back.label}</Link></div></>;
+  return <><p className="eyebrow">Connection story</p><h1>A moment of care</h1><p className="eyebrow">Story {story.story_code}</p><Notice {...await searchParams} /><div className="story-meta"><strong>{story.profiles?.display_name?.trim().split(/\s+/)[0] || "Community member"}</strong><span>{new Date(story.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span></div><article className="panel story-full" style={{ padding: 30 }}>{story.body}</article><div className="page-actions">{story.user_id === user.id && <Link className="button" href={`/stories/${story.id}/edit?returnTo=${encodeURIComponent(back.href)}`}>Edit my story</Link>}{canDelete && <DeleteStoryButton id={story.id} />}<Link className="button secondary" href={back.href}>{back.label}</Link></div></>;
 }

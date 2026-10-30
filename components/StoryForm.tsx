@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useActionState } from "react";
+import Link from "next/link";
+import Notice from "@/components/Notice";
 import { wordCount } from "@/lib/types";
 import { experiences } from "@/lib/experiences";
 import { themes, themeFor } from "@/lib/themes";
@@ -11,23 +13,33 @@ export default function StoryForm({
   id,
   experience,
   theme,
+  returnTo = "/stories/mine",
+  cancelHref = "/stories/mine",
 }: {
-  action: (data: FormData) => void | Promise<void>;
+  action: (data: FormData) => Promise<void | { error: string }>;
   initial?: string;
   id?: string;
   experience?: string | null;
   theme?: string;
+  returnTo?: string;
+  cancelHref?: string;
 }) {
   const [body, setBody] = useState(initial);
   const [selectedTheme, setSelectedTheme] = useState(theme || "");
+  const [selectedExperience, setSelectedExperience] = useState(experience || "");
+  const [state, submit, pending] = useActionState(async (_previous: { error: string }, data: FormData) => {
+    const result = await action(data);
+    return result || { error: "" };
+  }, { error: "" });
   const count = wordCount(body);
   return (
-    <form action={action} className="story-form">
+    <form action={submit} className="story-form" onReset={event => event.preventDefault()}>
       {id && <input type="hidden" name="id" value={id} />}
+      <input type="hidden" name="returnTo" value={returnTo} />
       <fieldset className="experience-options">
         <legend>Where did this experience come from? Choose one.</legend>
         {experiences.map(option => <label key={option}>
-          <input type="radio" name="experience" value={option} defaultChecked={experience === option} required /><span>{option}</span>
+          <input type="radio" name="experience" value={option} checked={selectedExperience === option} onChange={() => setSelectedExperience(option)} required /><span>{option}</span>
         </label>)}
       </fieldset>
       <label htmlFor="body">Tell us about the experience</label>
@@ -44,7 +56,6 @@ export default function StoryForm({
         value={body}
         onChange={(event) => setBody(event.target.value)}
         required
-        autoFocus
       />
       <div className={`word-count ${count > 300 ? "over-limit" : ""}`} aria-live="polite">
         {count} of 300 words
@@ -56,11 +67,15 @@ export default function StoryForm({
           <option value="" disabled>Select one theme</option>
           {themes.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
         </select>
-        <p id="theme-description" className="field-help" aria-live="polite">{themeFor(selectedTheme)?.description}</p>
+        <p id="theme-description" className="field-help" aria-live="polite">{selectedTheme && <><strong>{themeFor(selectedTheme)?.label}</strong><br />{themeFor(selectedTheme)?.description}</>}</p>
       </div>
-      <button className="button" type="submit" disabled={count === 0 || count > 300}>
-        Save story
-      </button>
+      <Notice error={state.error} />
+      <div className="page-actions">
+        <button className="button" type="submit" disabled={pending || count === 0 || count > 300}>
+          {pending ? "Saving…" : "Save story"}
+        </button>
+        <Link className="button secondary" href={cancelHref}>Cancel</Link>
+      </div>
     </form>
   );
 }

@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Image className="logo" src="/beautiful-mess-logo.jpg" alt="Beautiful Mess Ministries" width={693} height={233} preload unoptimized />
             </Link>
             <nav aria-label="Main navigation">
-              {profile ? <>
+              {profile?.active ? <>
                 <Link href="/dashboard">Home</Link>
                 <Link href="/stories/new">Create Story</Link>
                 <Link href="/stories/mine">My Stories</Link>
@@ -36,12 +36,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <StoriesMenu label="Community Themes" href="/themes" />
                 {profile.role === "admin" && <Link href="/admin">Admin</Link>}
                 <form className="nav-form" action={logout}><button className="nav-button">Log out</button></form>
-              </> : <Link href="/login">Log in</Link>}
+              </> : profile ? <form className="nav-form" action={logout}><button className="nav-button">Log out</button></form> : <Link href="/login">Log in</Link>}
             </nav>
           </div>
         </header>
         <main id="main" className="container">{children}</main>
-        <footer><div className="footer-inner"><strong>Beautiful Mess Ministries</strong><p>Every delivery has a story worth sharing.</p></div></footer>
+        <footer><div className="footer-inner"><strong>Beautiful Mess Ministries</strong><p>Every connection has a story worth sharing.</p></div></footer>
       </body>
     </html>
   );

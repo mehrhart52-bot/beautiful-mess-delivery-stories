@@ -1,13 +1,14 @@
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { Story } from "@/lib/types";
+import Notice from "@/components/Notice";
 import StoryCard from "@/components/StoryCard";
 import { isExperience } from "@/lib/experiences";
 
 import StorySearch from "@/components/StorySearch";
 import { normalizeStorySearch, storyListUrl } from "@/lib/story-search";
 
-export default async function AllStories({ searchParams }: { searchParams: Promise<{ experience?: string; q?: string }> }) {
+export default async function AllStories({ searchParams }: { searchParams: Promise<{ experience?: string; q?: string; message?: string; error?: string }> }) {
   await requireUser();
   const search = normalizeStorySearch((await searchParams).q);
   const requested = (await searchParams).experience;
@@ -19,5 +20,5 @@ export default async function AllStories({ searchParams }: { searchParams: Promi
   const { data, error } = await query;
   if (error) throw new Error("Stories could not be loaded. Please try again.");
   const stories = (data ?? []) as Story[];
-  return <><p className="eyebrow">Community</p><h1>{selected ? `${selected} stories` : "All connection stories"}</h1><p className="lead">See how connections are making a difference throughout our community.</p><StorySearch action="/stories/all" search={search} filters={{ experience: selected }} />{stories.length ? <div className="story-list">{stories.map(story => <StoryCard story={story} showAuthor key={story.id} returnTo={storyListUrl("/stories/all", { experience: selected, q: search })} />)}</div> : <div className="empty"><h2>{search ? "No matching story in this collection" : "No stories have been shared here yet"}</h2><p>The first story will appear here after it is saved.</p></div>}</>;
+  return <><p className="eyebrow">Community</p><h1>{selected ? `${selected} stories` : "All connection stories"}</h1><p className="lead">See how connections are making a difference throughout our community.</p><Notice {...await searchParams} /><StorySearch action="/stories/all" search={search} filters={{ experience: selected }} />{stories.length ? <div className="story-list">{stories.map(story => <StoryCard story={story} showAuthor key={story.id} returnTo={storyListUrl("/stories/all", { experience: selected, q: search })} />)}</div> : <div className="empty"><h2>{search ? "No matching story in this collection" : "No stories have been shared here yet"}</h2><p>{search ? "Check the ID or clear your search to browse this collection." : "The first story will appear here after it is saved."}</p></div>}</>;
 }

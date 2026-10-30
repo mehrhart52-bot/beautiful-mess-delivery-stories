@@ -1,5 +1,9 @@
 # Beautiful Mess Ministries Connection Stories
 
+See [ADMIN_GUIDE.md](ADMIN_GUIDE.md) to make your account an administrator and
+review its permissions. [REVIEW_NOTES.md](REVIEW_NOTES.md) records the layout
+and workflow review, verification, and remaining live-service checks.
+
 ## Story IDs and search update
 
 IDs now use exactly four digits: C0001, B0002, O0003.
