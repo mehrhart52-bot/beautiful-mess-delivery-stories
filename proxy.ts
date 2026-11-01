@@ -10,7 +10,8 @@ export async function proxy(request: NextRequest) {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self'",
-    `connect-src 'self'${development ? " ws: wss:" : ""}`,
+    "frame-src https://challenges.cloudflare.com",
+    `connect-src 'self' https://challenges.cloudflare.com${development ? " ws: wss:" : ""}`,
     "object-src 'none'", "base-uri 'none'", "form-action 'self'", "frame-ancestors 'none'",
   ].join("; ");
   request.headers.set("Content-Security-Policy", policy);

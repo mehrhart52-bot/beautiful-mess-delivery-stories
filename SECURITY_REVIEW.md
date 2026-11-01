@@ -31,3 +31,13 @@ In this app's Supabase SQL Editor, run **supabase/20261101_security_hardening.sq
 4. **Verify deployed controls:** Apply all migrations, use Supabase Security Advisor, then test with two ordinary accounts and an admin. Verify email/password recovery, deactivation and access restrictions against the actual hosted site. The isolated tests cannot establish the current live database configuration.
 
 No hosting firewall, live authentication setting, or database migration was changed by this review.
+
+## Follow-up: bot protection and submission limits
+
+The app now integrates Turnstile on all four public authentication forms and adds
+resend-confirmation recovery. Database-backed per-account submission limits are
+implemented in `20261101_story_submission_limits.sql`. These address the previous
+lack of story quotas after that migration is applied. Multi-account abuse and
+provider traffic limits still need launch configuration. See
+[PRODUCTION_SECURITY_SETUP.md](PRODUCTION_SECURITY_SETUP.md) for activation steps
+and validation limits; live provider settings have not been changed.

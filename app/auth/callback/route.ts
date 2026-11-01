@@ -16,6 +16,8 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.redirect(
-    new URL("/login?error=The+email+link+is+invalid+or+has+expired.", url.origin),
+    new URL(next === "/reset-password"
+      ? "/forgot-password?error=This+reset+link+could+not+be+used.+Please+request+a+new+link+and+open+it+in+the+same+browser."
+      : "/verify-email?error=This+link+may+have+expired,+already+been+used,+or+opened+in+a+different+browser.+Try+logging+in+if+you+already+confirmed,+or+request+a+new+link.", url.origin),
   );
 }

@@ -12,18 +12,36 @@ import { isThemeId } from "@/lib/themes";
 const message = (path: string, text: string, error = false) =>
   `${path}?${error ? "error" : "message"}=${encodeURIComponent(text)}`;
 
+// Supabase verifies tokens server-side when CAPTCHA protection is enabled there.
+function captchaOptions(formData: FormData, path: string) {
+  const token = formData.get("captchaToken");
+  if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (typeof token !== "string" || !token || token.length > 2048)) {
+    redirect(message(path, "Please complete the security check and try again.", true));
+  }
+  return typeof token === "string" && token ? { captchaToken: token } : {};
+}
+function authFailure(code: string | undefined, fallback: string) {
+  if (code === "captcha_failed") return "The security check expired or could not be verified. Please complete a new check and try again.";
+  if (code === "over_request_rate_limit" || code === "over_email_send_rate_limit") return "Too many attempts. Please wait a few minutes before trying again.";
+  return fallback;
+}
+function confirmationUrl() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  return `${siteUrl.replace(/\/$/, "")}/auth/callback?next=/dashboard`;
+}
+
 export async function login(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({ email, password, options: captchaOptions(formData, "/login") });
   if (error) {
     const explanation = error.code === "email_not_confirmed"
-      ? "Your email has not been confirmed. Please use the confirmation email or contact the administrator for help."
+      ? "Please confirm your email before logging in. Use the link in your inbox, or choose Resend confirmation email below."
       : error.code === "invalid_credentials"
         ? "Email or password was not recognized. Check your password with Show, or choose Forgot your password."
         : "Login is temporarily unavailable. Please try again shortly.";
-    redirect(message("/login", explanation, true));
+    redirect(message("/login", authFailure(error.code, explanation), true));
   }
   redirect("/dashboard");
 }
@@ -35,18 +53,29 @@ export async function signup(formData: FormData) {
   if (!displayName || displayName.length > 100) redirect(message("/signup", "Please enter a name of up to 100 characters.", true));
   if (password.length < 8) redirect(message("/signup", "Use at least 8 characters for your password.", true));
   const supabase = await createClient();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      ...captchaOptions(formData, "/signup"),
       data: { display_name: displayName },
-      emailRedirectTo: `${siteUrl.replace(/\/$/, "")}/auth/callback?next=/dashboard`,
+      emailRedirectTo: confirmationUrl(),
     },
   });
-  if (error) redirect(message("/signup", "We could not create this account. Try signing in or resetting your password if you already registered, or try again later.", true));
+  if (error) redirect(message("/signup", authFailure(error.code, "We could not create this account. Try signing in or resetting your password if you already registered, or try again later."), true));
   if (data.session) redirect("/dashboard");
-  redirect(message("/login", "Check your email for a confirmation link before signing in."));
+  redirect(message("/verify-email", "Check your inbox for your confirmation email."));
+}
+
+export async function resendConfirmation(formData: FormData) {
+  const email = String(formData.get("email") ?? "").trim();
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({
+    type: "signup", email,
+    options: { ...captchaOptions(formData, "/verify-email"), emailRedirectTo: confirmationUrl() },
+  });
+  if (error) redirect(message("/verify-email", authFailure(error.code, "We could not send the email right now. Please try again shortly."), true));
+  redirect(message("/verify-email", "If this address has an account awaiting confirmation, a new link is on its way. If you already confirmed, you can log in."));
 }
 
 export async function logout() {
@@ -60,9 +89,10 @@ export async function requestReset(formData: FormData) {
   const supabase = await createClient();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    ...captchaOptions(formData, "/forgot-password"),
     redirectTo: `${siteUrl.replace(/\/$/, "")}/auth/callback?next=/reset-password`,
   });
-  if (error) redirect(message("/forgot-password", "We could not send a reset link right now. Please try again shortly.", true));
+  if (error) redirect(message("/forgot-password", authFailure(error.code, "We could not send a reset link right now. Please try again shortly."), true));
   redirect(message("/forgot-password", "If that email is registered, a reset link is on its way."));
 }
 
@@ -97,6 +127,8 @@ export async function createStory(formData: FormData) {
   if (validation) return { error: validation };
   const supabase = await createClient();
   const { error } = await supabase.from("stories").insert({ body, experience, theme, user_id: user.id });
+  if (error?.message === "story_too_soon") return { error: "Please wait 30 seconds between new stories. Your text is still here; try saving again shortly." };
+  if (error?.message === "story_daily_limit") return { error: "You have reached 20 new stories in 24 hours. Your text is still here; please copy it somewhere safe and return later." };
   if (error) return { error: "Your story could not be saved. Your text is still here; please try again." };
   revalidatePath("/stories");
   redirect(message("/stories/mine", "Your connection story was saved."));

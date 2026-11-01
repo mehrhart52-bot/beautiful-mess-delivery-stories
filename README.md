@@ -116,3 +116,15 @@ Before using this version with an existing database, run
 It restricts profile/email access and adds the first-name lookup used by story pages.
 Accounts and stories are preserved. New projects get these protections from `schema.sql`.
 See [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for findings, verification and launch items.
+
+## Bot protection and submission limits
+
+Apply `supabase/20261101_story_submission_limits.sql` to an existing database
+(after the security update above). New stories are limited to one every 30 seconds
+and 20 in a rolling 24-hour period per account. Editing remains available.
+
+Signup, login, password reset and the new `/verify-email` resend page support
+Cloudflare Turnstile. Enable CAPTCHA in Supabase and configure the matching site
+key in the app; email verification is enabled separately in Supabase. See
+[PRODUCTION_SECURITY_SETUP.md](PRODUCTION_SECURITY_SETUP.md) for exact setup and
+launch checks. These provider protections are not enabled by downloading code alone.
