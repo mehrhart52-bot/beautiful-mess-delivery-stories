@@ -108,3 +108,11 @@ npm run build
 ```
 
 Only use delivery stories that are appropriate to share with all signed-in users. Avoid full names, addresses, medical details, and other private information.
+
+## Security update — November 1, 2026
+
+Before using this version with an existing database, run
+`supabase/20261101_security_hardening.sql` in this app's Supabase SQL Editor.
+It restricts profile/email access and adds the first-name lookup used by story pages.
+Accounts and stories are preserved. New projects get these protections from `schema.sql`.
+See [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for findings, verification and launch items.

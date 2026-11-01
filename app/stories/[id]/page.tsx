@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import type { Story } from "@/lib/types";
+import { withStoryAuthors } from "@/lib/story-authors";
 import Notice from "@/components/Notice";
 import DeleteStoryButton from "@/components/DeleteStoryButton";
 import { storyReturn } from "@/lib/story-navigation";
@@ -12,9 +12,9 @@ export default async function StoryPage({ params, searchParams }: { params: Prom
   const user = await requireUser();
   const { id } = await params;
   const supabase = await createClient();
-  const { data } = await supabase.from("stories").select("*, profiles(display_name, email)").eq("id", id).single();
+  const { data } = await supabase.from("stories").select("*").eq("id", id).single();
   if (!data) notFound();
-  const story = data as Story;
+  const [story] = await withStoryAuthors([data]);
   const canDelete = story.user_id === user.id || user.role === "admin";
   return <><p className="eyebrow">Connection story</p><h1>A moment of care</h1><p className="eyebrow">Story {story.story_code}</p><Notice {...await searchParams} /><div className="story-meta"><strong>{story.profiles?.display_name?.trim().split(/\s+/)[0] || "Community member"}</strong><span>{new Date(story.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span></div><article className="panel story-full" style={{ padding: 30 }}>{story.body}</article><div className="page-actions">{story.user_id === user.id && <Link className="button" href={`/stories/${story.id}/edit?returnTo=${encodeURIComponent(back.href)}`}>Edit my story</Link>}{canDelete && <DeleteStoryButton id={story.id} />}<Link className="button secondary" href={back.href}>{back.label}</Link></div></>;
 }

@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import type { Story } from "@/lib/types";
+import { withStoryAuthors } from "@/lib/story-authors";
 import Notice from "@/components/Notice";
 import StoryCard from "@/components/StoryCard";
 import { isExperience } from "@/lib/experiences";
@@ -14,11 +14,11 @@ export default async function AllStories({ searchParams }: { searchParams: Promi
   const requested = (await searchParams).experience;
   const selected = isExperience(requested) ? requested : null;
   const supabase = await createClient();
-  let query = supabase.from("stories").select("*, profiles(display_name, email)").order("created_at", { ascending: false });
+  let query = supabase.from("stories").select("*").order("created_at", { ascending: false });
   if (selected) query = query.eq("experience", selected);
   if (search) query = query.eq("story_code", search);
   const { data, error } = await query;
   if (error) throw new Error("Stories could not be loaded. Please try again.");
-  const stories = (data ?? []) as Story[];
+  const stories = await withStoryAuthors(data ?? []);
   return <><p className="eyebrow">Community</p><h1>{selected ? `${selected} stories` : "All connection stories"}</h1><p className="lead">See how connections are making a difference throughout our community.</p><Notice {...await searchParams} /><StorySearch action="/stories/all" search={search} filters={{ experience: selected }} />{stories.length ? <div className="story-list">{stories.map(story => <StoryCard story={story} showAuthor key={story.id} returnTo={storyListUrl("/stories/all", { experience: selected, q: search })} />)}</div> : <div className="empty"><h2>{search ? "No matching story in this collection" : "No stories have been shared here yet"}</h2><p>{search ? "Check the ID or clear your search to browse this collection." : "The first story will appear here after it is saved."}</p></div>}</>;
 }

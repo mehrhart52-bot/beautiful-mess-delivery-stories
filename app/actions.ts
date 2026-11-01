@@ -32,7 +32,7 @@ export async function signup(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const displayName = String(formData.get("display_name") ?? "").trim();
-  if (!displayName) redirect(message("/signup", "Please enter your name.", true));
+  if (!displayName || displayName.length > 100) redirect(message("/signup", "Please enter a name of up to 100 characters.", true));
   if (password.length < 8) redirect(message("/signup", "Use at least 8 characters for your password.", true));
   const supabase = await createClient();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -44,7 +44,7 @@ export async function signup(formData: FormData) {
       emailRedirectTo: `${siteUrl.replace(/\/$/, "")}/auth/callback?next=/dashboard`,
     },
   });
-  if (error) redirect(message("/signup", error.message, true));
+  if (error) redirect(message("/signup", "We could not create this account. Try signing in or resetting your password if you already registered, or try again later.", true));
   if (data.session) redirect("/dashboard");
   redirect(message("/login", "Check your email for a confirmation link before signing in."));
 }
@@ -79,6 +79,7 @@ export async function updatePassword(formData: FormData) {
 }
 
 function validateStory(body: string) {
+  if (body.length > 10000) return "Please shorten your story to 10,000 characters or fewer.";
   const count = wordCount(body);
   if (!body.trim()) return "Please enter your connection story.";
   if (count > 300) return `Please shorten your story by ${count - 300} word${count - 300 === 1 ? "" : "s"}.`;

@@ -16,7 +16,7 @@ export type Story = {
   body: string;
   created_at: string;
   updated_at: string;
-  profiles?: { display_name: string; email: string } | null;
+  profiles?: { display_name: string } | null;
 };
 
 export function wordCount(value: string) {

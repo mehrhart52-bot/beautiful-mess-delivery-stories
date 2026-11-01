@@ -3,7 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { experiences, isExperience } from "@/lib/experiences";
 import { themes, themeFor } from "@/lib/themes";
-import type { Story } from "@/lib/types";
+import { withStoryAuthors } from "@/lib/story-authors";
 import StoryCard from "@/components/StoryCard";
 
 import StorySearch from "@/components/StorySearch";
@@ -33,12 +33,12 @@ export default async function CommunityThemes({ searchParams }: {
   if (selected) {
     const parsed = Number(params.page);
     const page = Number.isSafeInteger(parsed) && parsed > 0 ? Math.min(parsed, 100000) : 1;
-    let query = supabase.from("stories").select("*, profiles(display_name, email)", { count: "exact" }).eq("theme", selected.id);
+    let query = supabase.from("stories").select("*", { count: "exact" }).eq("theme", selected.id);
     if (experience) query = query.eq("experience", experience);
     if (search) query = query.eq("story_code", search);
     const { data, count, error } = await query.order("created_at", { ascending: false }).order("id").range((page - 1) * 20, page * 20 - 1);
     if (error) throw new Error("Theme stories could not be loaded. Please try again.");
-    const stories = (data ?? []) as Story[];
+    const stories = await withStoryAuthors(data ?? []);
     return <>
       <Link className="text-link" href={url()}>← All community themes</Link>
       <p className="eyebrow">Community Themes · {experience || "All stories"}</p>

@@ -1,0 +1,37 @@
+// Run with PGLITE_MODULE pointing to an installed @electric-sql/pglite module.
+const { PGlite } = await import(process.env.PGLITE_MODULE || '@electric-sql/pglite');
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const db=new PGlite();
+await db.exec(`create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;`);
+await db.exec(fs.readFileSync('supabase/schema.sql','utf8').replace('create extension if not exists pgcrypto;',''));
+const ids=['00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000003'];
+for(let i=0;i<3;i++)await db.query('insert into auth.users values ($1,$2,$3)',[ids[i],`test${i}@example.com`,JSON.stringify({display_name:'Test'})]);
+await db.query("update profiles set role='admin' where id=$1",[ids[0]]);
+async function asUser(i){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[ids[i]]);await db.exec('set role authenticated');}
+await asUser(1);let a=(await db.query("insert into stories(user_id,body,experience) values ($1,'A fictional story','CarePortal') returning id",[ids[1]])).rows[0].id;
+await asUser(2);let b=(await db.query("insert into stories(user_id,body,experience) values ($1,'Another fictional story','Other') returning id",[ids[2]])).rows[0].id;
+assert.equal((await db.query('select * from stories')).rows.length,2);
+assert.equal((await db.query('select email from profiles')).rows.length,1);
+assert.equal((await db.query('select email from profiles where id=$1',[ids[1]])).rows.length,0);
+assert.deepEqual((await db.query('select display_name from story_authors($1)',[[ids[1]]])).rows,[{display_name:'Test'}]);
+await assert.rejects(db.query("update stories set user_id=$1 where id=$2",[ids[2],a]));
+await assert.rejects(db.query("insert into stories(user_id,body) values ($1,$2)",[ids[2],'x'.repeat(10001)]));
+await assert.rejects(db.query("select nextval('story_number_seq')"));
+assert.equal((await db.query('delete from stories where id=$1 returning id',[a])).rows.length,0);
+assert.equal((await db.query("update stories set body='Unauthorized' where id=$1 returning id",[a])).rows.length,0);
+assert.equal((await db.query("update profiles set role='admin' where id=$1 returning id",[ids[2]])).rows.length,0);
+await asUser(0);assert.equal((await db.query('delete from stories where id=$1 returning id',[a])).rows.length,1);
+await assert.rejects(db.query("update profiles set role='user' where id=$1",[ids[0]]));
+await assert.rejects(db.query("update profiles set active=false where id=$1",[ids[0]]));
+await db.query('update profiles set active=false where id=$1',[ids[2]]);
+await asUser(2);assert.equal((await db.query('select * from stories')).rows.length,0);assert.equal((await db.query('delete from stories where id=$1 returning id',[b])).rows.length,0);
+await asUser(0);await db.query("update profiles set active=true,role='admin' where id=$1",[ids[2]]);
+await asUser(2);assert.equal((await db.query('delete from stories where id=$1 returning id',[b])).rows.length,1);
+console.log('Database permissions passed: user isolation, admin deletion, access management, inactive account restrictions, self-lockout protection.');
+await db.exec('reset role; set role anon');
+await assert.rejects(db.query('select * from stories'));
+await assert.rejects(db.query('select * from profiles'));
+await assert.rejects(db.query('select * from story_authors($1)',[[ids[1]]]));
+console.log('Security checks passed: anonymous access denied, member email isolation, safe author names, oversized text and identity changes rejected, sequence protected.');
+await db.close();
