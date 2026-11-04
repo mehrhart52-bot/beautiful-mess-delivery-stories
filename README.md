@@ -128,3 +128,10 @@ Cloudflare Turnstile. Enable CAPTCHA in Supabase and configure the matching site
 key in the app; email verification is enabled separately in Supabase. See
 [PRODUCTION_SECURITY_SETUP.md](PRODUCTION_SECURITY_SETUP.md) for exact setup and
 launch checks. These provider protections are not enabled by downloading code alone.
+
+## Scheduled security checks
+
+See [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md) for hourly dependency checks,
+daily code scans, Dependabot updates and automatic merging of compatible fixes
+after successful build/audit and CodeQL checks. GitHub settings and initial runs
+must be verified before relying on these protections.

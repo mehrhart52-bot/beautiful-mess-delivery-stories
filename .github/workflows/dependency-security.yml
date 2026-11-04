@@ -1,0 +1,31 @@
+name: Hourly dependency security check
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [package.json, package-lock.json, .github/workflows/dependency-security.yml]
+permissions:
+  contents: read
+concurrency:
+  group: dependency-security
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check locked dependencies, including build tools
+        run: npm audit --package-lock-only --audit-level=high
+      - name: Explain failures
+        if: failure()
+        run: |
+          echo '## Dependency check needs attention' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Review the audit output above. A high/critical advisory or a failed registry request makes this check fail. Dependabot security updates must be enabled in repository settings to prepare available fixes automatically. A passing audit does not rule out unknown vulnerabilities.' >> "$GITHUB_STEP_SUMMARY"
