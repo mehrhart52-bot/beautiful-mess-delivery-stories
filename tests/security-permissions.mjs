@@ -4,11 +4,23 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const db=new PGlite();
 await db.exec(`create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;`);
+// Model Supabase's explicit API-role default grants, not only PostgreSQL PUBLIC.
+await db.exec('alter default privileges in schema public grant execute on functions to anon, authenticated');
 await db.exec(fs.readFileSync('supabase/schema.sql','utf8').replace('create extension if not exists pgcrypto;',''));
 const ids=['00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000003'];
 for(let i=0;i<3;i++)await db.query('insert into auth.users values ($1,$2,$3)',[ids[i],`test${i}@example.com`,JSON.stringify({display_name:'Test'})]);
 await db.query("update profiles set role='admin' where id=$1",[ids[0]]);
 async function asUser(i){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[ids[i]]);await db.exec('set role authenticated');}
+// Check effective privileges, including inherited PUBLIC and explicit role grants.
+for (const role of ['anon', 'authenticated']) {
+  for (const fn of ['handle_new_user()', 'assign_story_code()', 'limit_story_submissions()', 'protect_own_admin_access()']) {
+    assert.equal((await db.query("select has_function_privilege($1,$2,'EXECUTE') as allowed",[role,'public.'+fn])).rows[0].allowed,false);
+  }
+}
+for (const fn of ['is_admin()', 'is_active_user()', 'story_authors(uuid[])']) {
+  assert.equal((await db.query("select has_function_privilege($1,$2,'EXECUTE') as allowed",['anon','public.'+fn])).rows[0].allowed,false);
+  assert.equal((await db.query("select has_function_privilege($1,$2,'EXECUTE') as allowed",['authenticated','public.'+fn])).rows[0].allowed,true);
+}
 await asUser(1);let a=(await db.query("insert into stories(user_id,body,experience) values ($1,'A fictional story','CarePortal') returning id",[ids[1]])).rows[0].id;
 await asUser(2);let b=(await db.query("insert into stories(user_id,body,experience) values ($1,'Another fictional story','Other') returning id",[ids[2]])).rows[0].id;
 assert.equal((await db.query('select * from stories')).rows.length,2);
@@ -32,6 +44,8 @@ console.log('Database permissions passed: user isolation, admin deletion, access
 await db.exec('reset role; set role anon');
 await assert.rejects(db.query('select * from stories'));
 await assert.rejects(db.query('select * from profiles'));
+await assert.rejects(db.query('select public.is_admin()'));
+await assert.rejects(db.query('select public.is_active_user()'));
 await assert.rejects(db.query('select * from story_authors($1)',[[ids[1]]]));
 console.log('Security checks passed: anonymous access denied, member email isolation, safe author names, oversized text and identity changes rejected, sequence protected.');
 await db.close();

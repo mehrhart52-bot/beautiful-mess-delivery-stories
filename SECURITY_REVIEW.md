@@ -41,3 +41,20 @@ lack of story quotas after that migration is applied. Multi-account abuse and
 provider traffic limits still need launch configuration. See
 [PRODUCTION_SECURITY_SETUP.md](PRODUCTION_SECURITY_SETUP.md) for activation steps
 and validation limits; live provider settings have not been changed.
+
+## Production Advisor follow-up — November 5, 2026
+
+The screenshot showed public and signed-in execute warnings for handle_new_user,
+is_active_user and is_admin; two of the reported eight warnings were not visible.
+`supabase/20261105_function_permissions.sql` revokes PUBLIC and explicit anon/
+authenticated execution of trigger-only functions and removes anonymous execution
+of access helpers and story_authors. It retains authenticated access to is_admin,
+is_active_user and story_authors: policies require the first two (both inspect only
+auth.uid()), and the app needs the last one's restricted first-name results.
+Signed-in SECURITY DEFINER warnings for these three functions may remain by design;
+this migration is not a claim that all Advisor warnings have been resolved.
+
+Tests model explicit Supabase-style default grants and verify effective privileges,
+new-user profile creation, member isolation, admin actions and submission limits.
+They passed in isolated PGlite. Apply only the new migration to existing projects,
+then rerun Security Advisor. No production database was changed from this workspace.
