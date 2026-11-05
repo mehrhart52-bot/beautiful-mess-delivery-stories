@@ -43,6 +43,7 @@ export async function login(formData: FormData) {
         : "Login is temporarily unavailable. Please try again shortly.";
     redirect(message("/login", authFailure(error.code, explanation), true));
   }
+  revalidatePath("/", "layout");
   redirect("/dashboard");
 }
 
@@ -63,7 +64,10 @@ export async function signup(formData: FormData) {
     },
   });
   if (error) redirect(message("/signup", authFailure(error.code, "We could not create this account. Try signing in or resetting your password if you already registered, or try again later."), true));
-  if (data.session) redirect("/dashboard");
+  if (data.session) {
+    revalidatePath("/", "layout");
+    redirect("/dashboard");
+  }
   redirect(message("/verify-email", "Check your inbox for your confirmation email."));
 }
 
@@ -81,6 +85,7 @@ export async function resendConfirmation(formData: FormData) {
 export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  revalidatePath("/", "layout");
   redirect("/login");
 }
 
@@ -105,6 +110,7 @@ export async function updatePassword(formData: FormData) {
   const { error } = await supabase.auth.updateUser({ password });
   if (error) redirect(message("/reset-password", "The reset link may have expired. Please request a new one.", true));
   await supabase.auth.signOut();
+  revalidatePath("/", "layout");
   redirect(message("/login", "Your password was changed. You can sign in now."));
 }
 

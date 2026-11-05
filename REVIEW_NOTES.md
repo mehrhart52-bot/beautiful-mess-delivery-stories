@@ -39,3 +39,19 @@ Real inbox delivery, recovery links across devices, and live-user end-to-end
 flows were not verified. Production Supabase email/redirect configuration
 still requires checking with the deployed app address. See ADMIN_GUIDE.md
 for the exact administrator capabilities and first-admin setup.
+
+## Login navigation correction — November 5, 2026
+
+A production user reported an authenticated dashboard with the logged-out header.
+Authentication actions now revalidate the root layout before redirecting after
+login, immediate-session signup, logout and password reset. Successful email
+callback exchange also invalidates the layout. `currentProfile` uses React's
+request-scoped cache so header and page share one verified account result within
+a render, without caching accounts across requests.
+
+Validation: production build passed. A Chromium test against a local simulated
+Supabase provider verified login → full navigation without manual reload → Create
+Story → logout → logged-out header, and confirmed direct dashboard access after
+logout redirects to login. No production account or story was used. The earlier
+email-link exchange error has not been reproduced or resolved by this change;
+real email confirmation/recovery still needs a separate end-to-end check.
