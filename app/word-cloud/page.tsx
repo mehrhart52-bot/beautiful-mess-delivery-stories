@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import WordCloudGraphic from "@/components/WordCloud";
 import { isExperience } from "@/lib/experiences";
 
-const stopWords = new Set("a an and are as at be been but by for from had has have he her hers him his i in is it its me my of on or our ours she that the their them they this to was we were with you your then there when where who what into after before just very so not out up down about over again also can could would should did do does some any each more most other such no nor only own same than too will".split(" "));
+const stopWords = new Set("a an and are as at be been but by for from had has have he her hers him his i in is it its me my of on or our ours she that the their them they this to was we were with you your then there when where who what into after before just very so not out up down about over again also can could would should did do does some any each more most other such no nor only own same than too will beautiful mess ministries".split(" "));
 
 function cloud(text: string) {
   const counts = new Map<string, number>();
